@@ -1,0 +1,196 @@
+<html>
+
+<head>
+
+
+
+
+    <style>
+        .msg {
+            color: indigo;
+
+        }
+
+        .msgg {
+            color: lawngreen;
+
+        }
+
+        .my {
+            text-align: center;
+        }
+    </style>
+
+
+</head>
+
+
+
+
+<body>
+
+    <script src="https://www.gstatic.com/firebasejs/7.8.1/firebase-app.js"></script>
+
+
+    <div class="chat">
+        <div class="chat-window" id="chat-window">
+            <!--Tag em azul-->
+            <ul id="messages">
+                <!-- criação de lista não ordenado -->
+                <li class="msg">
+                    <!-- criação do primeiro item  list item -->
+                    <span class="msg-span">
+                        <!-- span é pedaço de texto -->
+                        <i class="name">Host: </i>Hello and welcome to the chat!
+                    </span>
+                </li>
+                <li class="msg">
+                    <span class="msg-span">
+                        <i class="name">Guest: </i>Hey mother!
+                    </span>
+                </li>
+
+                <li class="msg my">
+                    <!-- mensagens que "eu" envio -->
+                    <span class="msg-span">
+                        <i class="name">Me: </i>My message is on the right
+                    </span>
+                </li>
+
+
+            </ul>
+            <!-- HTML é um negócio estático. Para colocar dinamicidade > java script -->
+
+            <form id="messageForm" autocomplete="off">
+                <input class="msgg" type="text" id="msg-input" placeholder="Enter a message">
+                <button id="msg-btn" type="submit">Send</button>
+            </form>
+        </div>
+    </div>
+    <!-- Div é  um conjunto. As vezes você quer aplicar estilo à um conjunto de coisas.-->
+    <!-- class é definição do estilo -->
+    <!-- id é usado para recuperar a tag -->
+
+
+    <!-- Insert this script at the bottom of the HTML, but before you use any Firebase services -->
+
+    <!-- Add the entire Firebase JavaScript SDK -->
+    <script src="https://www.gstatic.com/firebasejs/6.2.0/firebase.js"></script>
+
+    <script>
+
+
+
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyA0T95cHx3DrPM7dG-ve9Kq8tgOPstzSyA",
+            authDomain: "chat-learner.firebaseapp.com",
+            databaseURL: "https://chat-learner.firebaseio.com",
+            projectId: "chat-learner",
+            storageBucket: "chat-learner.appspot.com",
+            messagingSenderId: "480446507055",
+            appId: "1:480446507055:web:fa02f42c96734f2c437eda",
+            measurementId: "G-64QH2L00YY"
+        };
+        // <!-- objeto java script json (código java script) -->
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig); //inicialização....
+        // firebase.analytics(); //habilitação do analytics.
+
+
+        const db = firebase.database();
+        const msgRef = db.ref("/msgs"); // procura a pasta /msgs no db.
+        //lidando com firebase
+        //to store data in the msgs folder by creating a reference in database
+
+        const msgScreen = document.getElementById("messages"); //the <ul> that displays all the <li> msgs
+        const msgForm = document.getElementById("messageForm"); //the input form
+        const msgInput = document.getElementById("msg-input"); //the input element to write messages
+        const msgBtn = document.getElementById("msg-btn"); //the Send button
+
+        let name = ""; // como é let ela pode alterar seu valor.
+        //variável global.
+
+        function updateMsgs(data) {
+            const valor = data.val(); //tipo um get
+            console.log(valor);
+            //valor:
+            //{
+            //   name: "Jairo",
+            //   text: "Olá Bragaia"
+            //  } 
+
+
+            const new_item = `<li class="msg">
+                    <span class="msg-span">
+                        <i class="name">${valor.name}:</i> ${valor.text}
+                    </span>
+                </li>`;
+
+
+
+            msgScreen.innerHTML += new_item; //add the <li> message to the chat window
+
+            //auto scroll to bottom
+            document.getElementById("chat-window").scrollTop = document.getElementById("chat-window").scrollHeight;
+        }
+
+
+
+        function init() {
+            name = prompt("Please enter your name");
+            console.log(name);
+            //debuggar
+            // log criar histórico
+            //prompt pop uma janela para ...etc
+
+            msgRef.on('child_added', updateMsgs);
+            //.on é uma função desse objeto que executa
+            // um callback quando um certo evento acontece.
+            // o evento é o child_added;
+            // item adicionado ao Bd.
+            // callback é uma função executada em seguida.
+
+
+
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+        //DOM é o HTML disponível ao java-script.
+        //json é só  objeto java script. 
+
+        function sendMessage(e) {
+            e.preventDefault();
+            const text = msgInput.value;
+            console.log(text);
+
+            if (!text.trim()) return alert('Please type a message'); //no msg submitted
+            //função trim pega a string e tira os espaços vazios do início e final.
+
+            const msg = { //objeto que vai ser salvo no db
+                name: name,
+                text: text
+            };
+
+            console.log(msg);
+
+            msgRef.push(msg); // push é adicionar... nesse caso para o db.
+            msgInput.value = "";
+        }
+
+        msgForm.addEventListener('submit', sendMessage);
+        // MEDITADA.
+
+
+
+
+    </script>
+
+
+
+</body>
+
+
+
+</html>
